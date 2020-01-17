@@ -11,3 +11,56 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.card_container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+}
+
+.card {
+  width: 24%;
+  margin: 1%;
+  text-align: center;
+}
+
+.card h3 {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.card h2 {
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.sizes .button {
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  text-align: center;
+  background-color: #aaa;
+  color: white;
+  border: none;
+  margin: 5px 2px 15px 2px;
+}
+
+.sizes .button:hover {
+  background-color: #777;
+  color: white;
+}
+
+#title {
+  height: 30px;
+}
+
+#description {
+  height: 25px;
+}
+
+#price {
+  height: 35px;
+}
