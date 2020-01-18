@@ -13,28 +13,61 @@ code {
 }
 
 .card_container {
+  margin-top: 80px;
   width: 100%;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   align-content: center;
   justify-content: center;
+  z-index: 1;
 }
 
-.card {
+.cart_logo {
+  color: white;
+  text-align: center;
+  width: 90% !important;
+}
+
+.cart_card {
+  position: relative;
+  width: 100%;
+  border: 1px solid #333;
+  height: 130px;
+}
+
+.cart_card img {
+  height: 100%;
+}
+
+.info {
+  color: white;
+  margin-left: 100px;;
+  margin-top: -125px;
+}
+
+#cart_title {
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.product_card {
+  border: 1px solid #ccc;
   width: 24%;
   margin: 1%;
   text-align: center;
+  z-index: 5 !important;
 }
 
-.card h3 {
+.product_card h3 {
   font-weight: bold;
   font-size: 18px;
 }
 
-.card h2 {
+.product_card h2 {
   font-weight: bold;
-  font-size: 24px;
+  font-size: 20px;
+  margin: 5px;
 }
 
 .sizes .button {
@@ -48,19 +81,112 @@ code {
   margin: 5px 2px 15px 2px;
 }
 
+.addtocart {
+  height: 50px;
+  width: 180px;
+  text-align: center;
+  background-color: #555;
+  color: white;
+  border: none;
+  font-size: 20px;
+  margin: 5px 2px 15px 2px;
+}
+
 .sizes .button:hover {
   background-color: #777;
   color: white;
 }
 
-#title {
-  height: 30px;
+.addtocart:hover {
+  background-color: #222;
+  color: white;
+  cursor: pointer;
 }
 
-#description {
-  height: 25px;
+.header {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 40px !important;
+  color: white !important;
+  font-weight: lighter;
+  position: relative;
+  top: 10px;
+  z-index: 40 !important;
+  width: 410px;
+  margin: auto;
+  z-index: 20 !important;
 }
 
-#price {
-  height: 35px;
+#shopping_cart_icon {
+  width: 40px;
+  height: 40px;
+  margin: 20px 10px;
+}
+
+.cart_button {
+  float: right;
+  width: 80px;
+  height: 80px;
+  margin-top: -60px;
+  background-color: #354975 !important;
+  color: white;
+  z-index: 50;
+  cursor: pointer;
+  border: none;
+}
+
+.cart_button:hover {
+  background-color: #1d2a47 !important;
+}
+
+.navbar {
+  background-color: #354975 !important;
+  width: 100%;
+  height: 80px;
+  position: fixed !important;
+  top: 0;
+  z-index: 50px;
+  display: inline !important;
+}
+
+#cart-tab {
+  background-color: black !important;
+  height: 100%;
+  position: fixed;
+  float: right;
+  z-index: 60 !important;
+}
+
+.overlay {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.overlay-content {
+  position: relative;
+  top: 0;
+  width: 100%;
+  text-align: left;
+  margin-top: 30px;
+}
+
+.closebtn {
+  cursor: pointer;
+  z-index: 60 !important;
+  width: 80px;
+  height: 80px;
+  border: none;
+  background-color: black;
+  color: white;
+  font-size: 50px;
+}
+
+.closebtn:hover {
+  color: #999;
 }
