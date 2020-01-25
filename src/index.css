@@ -34,6 +34,8 @@ code {
   width: 100%;
   border: 1px solid #333;
   height: 130px;
+  max-height: 130px;
+  overflow-y: hidden;
 }
 
 .cart_card img {
@@ -48,7 +50,11 @@ code {
 
 #cart_title {
   font-weight: bold;
-  font-size: 24px;
+  font-size: 16px;
+}
+
+.info h2 {
+  font-size: 14px;
 }
 
 .product_card {
@@ -189,4 +195,40 @@ code {
 
 .closebtn:hover {
   color: #999;
+}
+
+.deletebtn {
+  float: right;
+  color: white;
+  background-color: black;
+  border: none;
+  font-size: 30px;
+  cursor:pointer;
+}
+
+.deletebtn:hover {
+  color: #999;
+}
+
+.selected-size {
+  background-color: black !important;
+  color: white !important;
+}
+
+.qtybtn {
+  color: white;
+  background-color: #444;
+  border: none;
+  font-size: 15px;
+  cursor:pointer;
+  margin-top: -20px;
+  position: relative;
+  left: 80px;
+  bottom: 22px;
+  text-align: center;
+  margin: 1px;
+}
+
+.inactive {
+  background-color: #111;
 }
