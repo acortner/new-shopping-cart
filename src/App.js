@@ -13,99 +13,131 @@ function closeCart() {
   document.getElementById("cart-tab").style.width = "0%";
 }
 
-function addToCart() {
-
-}
-
 const App = () => {
   const [data, setData] = useState({});
-  const [itemSize, setItemSize] = useState("");
   const [cartData, setCartData] = useState([]);
+  const [inventory, setInventory] = useState({});
   const products = Object.values(data);
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await fetch('./data/products.json');
       const json = await response.json();
+      const inv_response = await fetch('./data/inventory.json');
+      const inv_json = await inv_response.json();
+      setInventory(inv_json);
       setData(json);
     };
     fetchProducts();
   }, []);
-
   return (
     <div>
       <Navbar>
         <h1 class="header">Amazon... but better</h1>
         <Button class="cart_button" onClick={openCart}><FontAwesomeIcon icon={faShoppingCart} id="shopping_cart_icon"/></Button>
-        <div id="cart-tab" class="overlay">
-          <Button class="closebtn" onClick={closeCart}>&times;</Button>
-          <FontAwesomeIcon icon={faShoppingCart} class="cart_logo" id="shopping_cart_icon"/>
-          <div class="overlay-content">
-            <Cart setCartData={setCartData} items={cartData}/>
-          </div>
-        </div>
+        <Cart setCartData={setCartData} items={cartData} inventory={inventory} setInventory={setInventory}/>
       </Navbar>
       <div class="card_container">
-        {products.map(product => <ItemCard product={product} cartData={cartData} setCartData={setCartData}/>)}
+        {products.map(product => <ItemCard product={product} cartData={cartData} setCartData={setCartData} inventory={inventory} setInventory={setInventory}/>)}
       </div>
     </div>
   );
 };
 
-const ItemCard = ({product, cartData, setCartData}) => {
+const ItemCard = ({product, cartData, setCartData, inventory, setInventory}) => {
   const [itemSize, setItemSize] = useState("");
   return (
     <Card class="product_card" key={product.sku}><img src={"./data/products/" + product.sku + "_1.jpg"} alt="product image"/>
       <h3 id="title">{product.title}</h3>
       <p id="description">{product.description}</p>
       <h2 id="price">{"$" + product.price.toFixed(2)}</h2>
+      {inventory[product.sku].S || inventory[product.sku].M || inventory[product.sku].L || inventory[product.sku].XL ?
       <div class="sizes">
-        <SelectSize setItemSize={setItemSize} selectedSize={itemSize} size="S"/>
-        <SelectSize setItemSize={setItemSize} selectedSize={itemSize} size="M"/>
-        <SelectSize setItemSize={setItemSize} selectedSize={itemSize} size="L"/>
-        <SelectSize setItemSize={setItemSize} selectedSize={itemSize} size="XL"/>
-      </div>
-      <AddToCart setCartData={setCartData} item={product} size={itemSize} cartData={cartData}/>
+        {inventory[product.sku].S ? <SelectSize availabile="True" setItemSize={setItemSize} selectedSize={itemSize} size="S"/> : <SelectSize available="False" setItemSize={setItemSize} selectedSize={itemSize} size="S"/>}
+        {inventory[product.sku].M ? <SelectSize availabile="True" setItemSize={setItemSize} selectedSize={itemSize} size="M"/> : <SelectSize available="False" setItemSize={setItemSize} selectedSize={itemSize} size="M"/>}
+        {inventory[product.sku].L ? <SelectSize availabile="True" setItemSize={setItemSize} selectedSize={itemSize} size="L"/> : <SelectSize available="False" setItemSize={setItemSize} selectedSize={itemSize} size="L"/>}
+        {inventory[product.sku].XL ? <SelectSize availabile="True" setItemSize={setItemSize} selectedSize={itemSize} size="XL"/> : <SelectSize available="False" setItemSize={setItemSize} selectedSize={itemSize} size="XL"/>}
+      </div> :
+      <h2 id="oos">OUT OF STOCK</h2>
+      }
+      <AddToCart setCartData={setCartData} item={product} size={itemSize} cartData={cartData} inventory={inventory} setInventory={setInventory}/>
     </Card>
   );
 }
 
-const SelectSize = ({setItemSize, selectedSize, size}) => {
+const SelectSize = ({available, setItemSize, selectedSize, size}) => {
+  const buttonType = () => {
+    if (available === "False") {
+      return <Button class="button unavailable">{size}</Button>;
+      console.log("Size Unavailable");
+    } else if (selectedSize === size) {
+      return <Button class="button selected-size" onClick={() => setItemSize(size)}>{size}</Button>;
+    } else {
+      return <Button class="button" onClick={() => setItemSize(size)}>{size}</Button>;
+    }
+  }
   return (
-    selectedSize === size ? <Button class="button selected-size" onClick={() => setItemSize(size)}>{size}</Button> : <Button class="button" onClick={() => setItemSize(size)}>{size}</Button>
+    buttonType()
   );
 }
 
-const AddToCart = ({setCartData, item, size, cartData}) => {
+const AddToCart = ({setCartData, item, size, cartData, inventory, setInventory}) => {
+  const [num, setNum] = useState(0);
+  const updateCart = () => {
+    for (var i = 0; i < cartData.length; i++) {
+      if (cartData[i].it === item && cartData[i].sz === size) {
+        setCartData(cartData.map(i => i.it === item && i.sz === size ? {n: i.n, it: i.it, sz: i.sz, qt: i.qt+1} : {n: i.n, it: i.it, sz: i.sz, qt: i.qt}));
+        setInventory({...inventory, [item.sku]: {...inventory[item.sku], [size]: inventory[item.sku][size]-1}});
+        return;
+      }
+    }
+    setCartData([...cartData, {n: num, it: item, sz: size, qt: 1}]);
+    setInventory({...inventory, [item.sku]: {...inventory[item.sku], [size]: inventory[item.sku][size]-1}});
+    setNum(num => num + 1);
+  }
   return (
-    <Button class="addtocart" onClick={size ? () => {setCartData([...cartData, {it: item, sz: size}])} : () => {alert("Please select a size.")}}>Add to Cart</Button>
+    <Button class="addtocart" onClick={size ? () => {updateCart(); openCart();} : () => {alert("Please select a size.")}}>Add to Cart</Button>
   );
 }
 
-const Cart = ({setCartData, items}) => {
+const Cart = ({setCartData, items, inventory, setInventory}) => {
+  const getSubtotal = () => {
+    var subtotal = 0;
+    for (var i = 0; i < items.length; i++) {
+      subtotal += items[i].it.price * items[i].qt;
+    }
+    return subtotal;
+  }
   return (
     <div>
-      {items.map(item => <Card class="cart_card">
-        <img src={"./data/products/" + item.it.sku + "_1.jpg"} alt=""/>
-        <Button class="deletebtn" onClick={() => {setCartData(items.filter(i => item.it.sku !== i.it.sku))}}>&times;</Button>
-        <div class="info">
-          <h2 id="cart_title">{item.it.title}</h2>
-          <h2 id="cart_price">{"$" + item.it.price.toFixed(2)}</h2>
-          <h2 id="cart_size">{"Size: " + item.sz}</h2>
-          <Quantity />
+      <div id="cart-tab" class="overlay">
+        <div class="overlay-content"></div>
+          <div class="cart_header">
+            <Button class="closebtn" onClick={closeCart}>&times;</Button>
+            <FontAwesomeIcon icon={faShoppingCart} class="cart_logo" id="shopping_cart_icon"/>
+          </div>
+          <div class="cart_contents">
+            {items.map(item => <Card class="cart_card">
+              <img src={"./data/products/" + item.it.sku + "_1.jpg"} alt=""/>
+              <Button class="deletebtn" onClick={() => {setCartData(items.filter(i => item !== i)); setInventory({...inventory, [item.it.sku]: {...inventory[item.it.sku], [item.sz]: inventory[item.it.sku][item.sz]+item.qt}});}}>&times;</Button>
+              <div class="info">
+                <h2 id="cart_title">{item.it.title}</h2>
+                <h2 id="cart_price">{"$" + item.it.price.toFixed(2)}</h2>
+                <h2 id="cart_size">{"Size: " + item.sz}</h2>
+                <div>
+                  <h2>{"Quantity: " + item.qt}</h2>
+                  {item.qt > 1 ? <Button class="qtybtn" onClick={() => {setInventory({...inventory, [item.it.sku]: {...inventory[item.it.sku], [item.sz]: inventory[item.it.sku][item.sz]+1}});setCartData(items.map(i => i.n === item.n && i.it === item.it ? {n: i.n, it: i.it, sz: i.sz, qt: i.qt-1} : {n: i.n, it: i.it, sz: i.sz, qt: i.qt}))}}>-</Button> : <Button class="qtybtn inactive">-</Button>}
+                  {inventory[item.it.sku][item.sz] > 0 ? <Button class="qtybtn" onClick={() => {setInventory({...inventory, [item.it.sku]: {...inventory[item.it.sku], [item.sz]: inventory[item.it.sku][item.sz]-1}});setCartData(items.map(i => i.n === item.n && i.it === item.it? {n: i.n, it: i.it, sz: i.sz, qt: i.qt+1} : {n: i.n, it: i.it, sz: i.sz, qt: i.qt}))}}>+</Button> : <Button class="qtybtn inactive">+</Button>}
+                </div>
+              </div>
+            </Card>)}
+          </div>
+          <div class="checkout">
+            <h1 id="subtotal">SUBTOTAL</h1>
+            <h1 id="subtotal_price">{"$" + getSubtotal().toFixed(2)}</h1>
+            <Button id="chkoutbtn">CHECKOUT</Button>
+          </div>
         </div>
-      </Card>)}
-    </div>
-  );
-}
-
-const Quantity = () => {
-  const [quantity, setQuantity] = useState(1);
-  return (
-    <div>
-      <h2>{"Quantity: " + quantity}</h2>
-      {quantity > 1 ? <Button class="qtybtn" onClick={() => setQuantity(quantity => quantity - 1)}>-</Button> : <Button class="qtybtn inactive">-</Button>}
-      <Button class="qtybtn" onClick={() => setQuantity(quantity => quantity + 1)}>+</Button>
-    </div>
+      </div>
   );
 }
 

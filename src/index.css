@@ -164,7 +164,6 @@ code {
 }
 
 .overlay {
-  height: 100%;
   width: 0;
   position: fixed;
   z-index: 1;
@@ -172,6 +171,8 @@ code {
   right: 0;
   overflow-x: hidden;
   transition: 0.5s;
+  height: 100%;
+  overflow: hidden;
 }
 
 .overlay-content {
@@ -231,4 +232,77 @@ code {
 
 .inactive {
   background-color: #111;
+}
+
+#subtotal {
+  color: white;
+  font-size: 16px;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+}
+
+.checkout {
+  position: fixed;
+  bottom: 0px;
+  background-color: #222;
+  width: 30%;
+  margin: 0 auto;
+  height: 170px;
+}
+
+#subtotal_price {
+  color: white;
+  font-weight: bold !important;
+  font-size: 30px !important;
+  float: right;
+  margin: 5px 15px;
+}
+
+#chkoutbtn {
+  height: 60px;
+  width: 80%;
+  background-color: #555;
+  color: white;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 0;
+  left: 10%;
+  top: 20px;
+}
+
+.cart_contents {
+  height: 100vh;
+  overflow-y: scroll;
+  padding-bottom: 360px;
+  margin-top: 200px;
+}
+
+.cart_header {
+  height: 170px;
+  position: fixed;
+  background-color: black;
+  z-index: 100;
+  width: 30%;
+  top: 0px;
+}
+
+.unavailable {
+  background-color: #e7e7e7 !important;
+  cursor: auto !important;
+  color: white !important;
+}
+
+.unavailable:hover {
+  color: white !important;
+}
+
+.unavailable:active {
+  color: white !important;
+}
+
+#oos {
+  font-size: 28px;
+  font-weight: lighter !important;
 }
