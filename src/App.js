@@ -1,9 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import "rbx/index.css";
-import { Button, Container, Message, Title, Card } from "rbx";
+import { Button, Card } from "rbx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons'
 import { Navbar } from 'react-bootstrap'
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/database';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCL6NAT4aKpTx9kRkl1GjDHonMNKctrBPs",
+  authDomain: "shopping-cart-app-d9ce7.firebaseapp.com",
+  databaseURL: "https://shopping-cart-app-d9ce7.firebaseio.com",
+  projectId: "shopping-cart-app-d9ce7",
+  storageBucket: "shopping-cart-app-d9ce7.appspot.com",
+  messagingSenderId: "970456502678",
+  appId: "1:970456502678:web:b2f983275db42704d30db7"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database().ref();
 
 function openCart() {
   document.getElementById("cart-tab").style.width = "30%";
@@ -19,15 +35,16 @@ const App = () => {
   const [inventory, setInventory] = useState({});
   const products = Object.values(data);
   useEffect(() => {
-    const fetchProducts = async () => {
-      const response = await fetch('./data/products.json');
-      const json = await response.json();
-      const inv_response = await fetch('./data/inventory.json');
-      const inv_json = await inv_response.json();
-      setInventory(inv_json);
-      setData(json);
-    };
-    fetchProducts();
+    const handleData = async snap => {
+      if (snap.val()) {
+        setInventory(snap.val());
+      } 
+      const product_response = await fetch('./data/products.json');
+      const product_json = await product_response.json();
+      setData(product_json);
+    }
+    db.on('value', handleData, error => alert(error));
+    return () => { db.off('value', handleData); };
   }, []);
   return (
     <div>
@@ -68,7 +85,6 @@ const SelectSize = ({available, setItemSize, selectedSize, size}) => {
   const buttonType = () => {
     if (available === "False") {
       return <Button class="button unavailable">{size}</Button>;
-      console.log("Size Unavailable");
     } else if (selectedSize === size) {
       return <Button class="button selected-size" onClick={() => setItemSize(size)}>{size}</Button>;
     } else {
